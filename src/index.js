@@ -6,6 +6,7 @@ import { createMarkup } from './js/createMarkup';
 import { refs } from './js/refs';
 
 const pixabay = new PixabayAPI();
+let lightbox = null;
 
 const onSubmit = e => {
     e.preventDefault();
@@ -34,7 +35,7 @@ const onSubmit = e => {
         
         const markup = createMarkup(hits);
         refs.gallery.insertAdjacentHTML('beforeend', markup);
-        var lightbox = new SimpleLightbox('.gallery a', {captionsData:'alt', captionPosition:'bottom', animationSpeed:250});
+        lightbox = new SimpleLightbox('.gallery a', {captionsData:'alt', captionPosition:'bottom', animationSpeed:250});
 
         pixabay.calculateTotalPages(totalHits);
         console.log(pixabay);
@@ -54,6 +55,7 @@ const onLoadMore = () => {
     pixabay.getImage().then(({ hits, totalHits }) => {
         const markup = createMarkup(hits);
         refs.gallery.insertAdjacentHTML('beforeend', markup);
+        lightbox.refresh();
     })
     if (!pixabay.isLoadMoreBtnShown) {
             refs.loadMoreBtn.classList.add('is-hidden');
@@ -64,7 +66,6 @@ const onLoadMore = () => {
 
 refs.searchForm.addEventListener('submit', onSubmit);
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
-
 
 
 // document.addEventListener('scroll', (event) => {
