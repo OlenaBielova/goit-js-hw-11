@@ -1,54 +1,80 @@
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-import {PixabayAPI} from './js/PixabayAPI';
+import SimpleLightbox from "simplelightbox";
+import "simplelightbox/dist/simple-lightbox.min.css";
+import { PixabayAPI } from './js/PixabayAPI';
+import { createMarkup } from './js/createMarkup';
+import { refs } from './js/refs';
 
 const pixabay = new PixabayAPI();
-
-const refs = {
-    searchForm: document.querySelector('#search-form'),
-    gallery: document.querySelector('.gallery'),
-    loadMoreBtn: document.querySelector('.load-more-btn')
-}
 
 const onSubmit = e => {
     e.preventDefault();
 
     const {
-elements: { searchQuery },
+        elements: { searchQuery },
     } = e.currentTarget;
 
-    const query = searchQuery.value.trim().toLowerCase();
-    console.log(query);
-    if (!query) {
+    const currentQuery = searchQuery.value.trim().toLowerCase();
+    console.log(currentQuery);
+    if (!currentQuery) {
         return;
     }
-    pixabay.getImage(query).then(({hits}) => {
-        console.log(hits);
+    pixabay.query = currentQuery;
+    pixabay.reserPage();
+    refs.gallery.innerHTML = '';
+    
+    pixabay.getImage().then(({ hits, totalHits }) => {
+        console.log(hits.length);
+        
+        if (hits.length === 0) {
+        Notify.failure("Sorry, there are no images matching your search query. Please try again.")
+        } else {
+            Notify.success(`Hooray! We found ${totalHits} images.`);
+        }
+        
         const markup = createMarkup(hits);
         refs.gallery.insertAdjacentHTML('beforeend', markup);
-    });
+        var lightbox = new SimpleLightbox('.gallery a', {captionsData:'alt', captionPosition:'bottom', animationSpeed:250});
+
+        pixabay.calculateTotalPages(totalHits);
+        console.log(pixabay);
+        if (pixabay.isLoadMoreBtnShown) {
+            refs.loadMoreBtn.classList.remove('is-hidden');
+        }
+    })
+        .catch(error => {
+            console.log(error);
+        })
 };
 
-refs.searchForm.addEventListener('submit', onSubmit);
+const onLoadMore = () => {
+    pixabay.incrementPage();
+    console.log(pixabay);
 
-function createMarkup(hits) {
-    return hits.map(({ webformatURL, tags, likes, views, comments, downloads }) => {
-        
-        return `<div class="photo-card">
-          <img src="${webformatURL}" alt="${tags}" loading="lazy" />
-          <div class="info">
-            <p class="info-item">
-              <b>Likes</b><br>${likes}
-            </p>
-            <p class="info-item">
-              <b>Views</b><br>${views}
-            </p>
-            <p class="info-item">
-              <b>Comments</b><br>${comments}
-            </p>
-            <p class="info-item">
-              <b>Downloads</b><br>${downloads}
-            </p>
-          </div>
-        </div>`;
-    }).join('');
+    pixabay.getImage().then(({ hits, totalHits }) => {
+        const markup = createMarkup(hits);
+        refs.gallery.insertAdjacentHTML('beforeend', markup);
+    })
+    if (!pixabay.isLoadMoreBtnShown) {
+            refs.loadMoreBtn.classList.add('is-hidden');
+            Notify.info("We're sorry, but you've reached the end of search results.");
+        }
+    
 }
+
+refs.searchForm.addEventListener('submit', onSubmit);
+refs.loadMoreBtn.addEventListener('click', onLoadMore);
+
+
+
+// document.addEventListener('scroll', (event) => {
+//     const { height: cardHeight } = document
+//     .querySelector(".gallery")
+//     .firstElementChild.getBoundingClientRect();
+
+// window.scrollBy({
+//     top: cardHeight * 2,
+//     behavior: "smooth",
+// });
+// });
+

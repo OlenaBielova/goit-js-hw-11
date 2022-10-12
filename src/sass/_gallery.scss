@@ -3,14 +3,22 @@
     flex-wrap: wrap;
     gap: 10px;
 }
+
 .photo-card {
 flex-basis: calc((100% - 30px) / 4);
+outline: 1px solid lightgrey;
+box-shadow: 3px 3px 3px lightgrey;
 }
 
 .info {
     display: flex;
     justify-content: space-around;
     font-size: 9px;
+    line-height: 2;
+}
+
+.info-item {
+    text-align: center;
 }
 
 img {

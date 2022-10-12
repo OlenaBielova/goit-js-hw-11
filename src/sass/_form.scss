@@ -1,17 +1,42 @@
 .search-form {
     display: flex;
     justify-content: center;
+    position: fixed;
+    top: 0px;
+    width: 100%;
     padding: 10px;
     background-color: #4a61bd;
 }
 
+.search-input {
+padding-left: 10;
+border: 0;
+}   
+
 .load-more-btn {
+margin: 30 auto;
+display: block;
+text-transform: uppercase;
 background-color: #4a61bd;
 color: white;
 text-align: center;
-margin: 10px;
 padding: 10px;
 border: 0;
 border-radius: 5px;
 }
 
+.search-btn {
+    text-transform: uppercase;
+    align-items: center;
+    background-color: white;
+    color: #4a61bd;
+    text-align: center;
+    margin-left: 10px;
+    padding: 10px;
+    border: 0;
+    border-radius: 5px;
+}
+
+.is-hidden {
+    display: none;
+}
