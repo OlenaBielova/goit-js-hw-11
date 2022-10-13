@@ -6,7 +6,7 @@ import { createMarkup } from './js/createMarkup';
 import { refs } from './js/refs';
 
 const pixabay = new PixabayAPI();
-let lightbox = null;
+let lightbox = new SimpleLightbox('.gallery a', {captionsData:'alt', captionPosition:'bottom', animationSpeed:250});
 
 const onSubmit = e => {
     e.preventDefault();
@@ -35,7 +35,7 @@ const onSubmit = e => {
         
         const markup = createMarkup(hits);
         refs.gallery.insertAdjacentHTML('beforeend', markup);
-        lightbox = new SimpleLightbox('.gallery a', {captionsData:'alt', captionPosition:'bottom', animationSpeed:250});
+        lightbox.refresh();
 
         pixabay.calculateTotalPages(totalHits);
         console.log(pixabay);
